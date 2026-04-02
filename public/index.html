@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Grading System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="background-gradient"></div>
+  
+  <!-- Login Screen -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <span class="login-icon">📚</span>
+          <h1>AcademicGrade</h1>
+          <p>Intelligent Assessment System</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter your username" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+          </div>
+
+          <div class="form-group">
+            <label for="role">Login As</label>
+            <select id="role" required>
+              <option value="">Select Role</option>
+              <option value="admin">Instructor (Admin)</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-login">Sign In</button>
+          <div id="loginStatus" class="status"></div>
+        </form>
+
+        <div class="demo-credentials">
+          <p><strong>Demo Credentials:</strong></p>
+          <p>👨‍🏫 Instructor: admin / password123</p>
+          <p>👨‍🎓 Student: student / password123</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application -->
+  <div id="appScreen" class="app-screen" style="display: none;">
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-content">
+        <div class="logo">
+          <span class="logo-icon">📚</span>
+          <span class="logo-text">AcademicGrade</span>
+        </div>
+        <div class="nav-info">
+          <span id="userDisplay" class="user-display"></span>
+          <button onclick="logout()" class="btn btn-logout">Logout</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+      <main class="main-content">
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" style="display: none;">
+          <!-- Hero -->
+          <section class="hero">
+            <h1>Instructor Dashboard</h1>
+            <p>Configure model answers and manage student submissions</p>
+          </section>
+
+          <!-- Setup Section -->
+          <section class="card setup-section">
+            <div class="card-header">
+              <h2>Configure Model Answers</h2>
+              <p class="subtitle">Set up reference materials for grading</p>
+            </div>
+
+            <div class="setup-grid">
+              <!-- Model Diagram Upload -->
+              <div class="upload-box" id="modelDiagramBox" ondrop="handleDrop(event, 'modelDiagram')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <div class="upload-icon">📐</div>
+                <h3>Model Diagrams</h3>
+                <p>Upload multiple reference diagrams</p>
+                <div class="upload-options">
+                  <div class="file-input-wrapper">
+                    <input type="file" id="modelDiagramFile" accept="image/*,.pdf" multiple class="file-input">
+                    <label for="modelDiagramFile" class="file-label">📁 Choose Files</label>
+                  </div>
+                  <button type="button" onclick="openCamera('modelDiagram')" class="btn btn-secondary">📷 Take Photo</button>
+                </div>
+                <p class="drag-hint">or drag & drop multiple files here</p>
+                <div id="modelDiagramPreview" class="preview-grid"></div>
+                <div id="modelDiagramStatus" class="status"></div>
+              </div>
+
+              <!-- Model Essay Upload -->
+              <div class="upload-box">
+                <div class="upload-icon">📝</div>
+                <h3>Model Essay</h3>
+                <p>Upload essay document or paste text</p>
+                <div class="upload-options">
+                  <div class="file-input-wrapper">
+                    <input type="file" id="modelEssayFile" accept=".pdf,.doc,.docx,.txt" class="file-input">
+                    <label for="modelEssayFile" class="file-label">📄 Upload Document</label>
+                  </div>
+                </div>
+                <p style="text-align: center; margin: 10px 0;">OR</p>
+                <textarea id="modelEssay" placeholder="Enter the model essay text here..." class="essay-input"></textarea>
+                <button onclick="uploadModelEssay()" class="btn btn-primary">Upload Essay</button>
+                <div id="modelEssayStatus" class="status"></div>
+              </div>
+            </div>
+
+            <div class="model-info" id="modelInfo" style="display: none;">
+              <h3>✅ Model Answers Configured</h3>
+              <p>Share this link with students to submit their work:</p>
+              <div class="share-link">
+                <input type="text" id="shareLink" readonly>
+                <button onclick="copyShareLink()" class="btn btn-small">Copy Link</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Student Dashboard -->
+        <div id="studentDashboard" style="display: none;">
+          <!-- Hero -->
+          <section class="hero">
+            <h1>Submit Your Work</h1>
+            <p>Upload your diagrams and essay for evaluation</p>
+          </section>
+
+          <!-- Submission Section -->
+          <section class="card submission-section">
+            <div class="card-header">
+              <h2>Submit Assignment</h2>
+              <p class="subtitle">Upload your diagrams and essay for grading</p>
+            </div>
+
+            <div class="submission-grid">
+              <!-- Student Diagram Upload -->
+              <div class="upload-box" id="studentDiagramBox" ondrop="handleDrop(event, 'studentDiagram')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <div class="upload-icon">📊</div>
+                <h3>Your Diagrams</h3>
+                <p>Upload multiple diagrams</p>
+                <div class="upload-options">
+                  <div class="file-input-wrapper">
+                    <input type="file" id="studentDiagramFile" accept="image/*,.pdf" multiple class="file-input">
+                    <label for="studentDiagramFile" class="file-label">📁 Choose Files</label>
+                  </div>
+                  <button type="button" onclick="openCamera('studentDiagram')" class="btn btn-secondary">📷 Take Photo</button>
+                </div>
+                <p class="drag-hint">or drag & drop multiple files here</p>
+                <div id="studentDiagramPreview" class="preview-grid"></div>
+              </div>
+
+              <!-- Student Essay Upload -->
+              <div class="upload-box">
+                <div class="upload-icon">✍️</div>
+                <h3>Your Essay</h3>
+                <p>Upload document or paste text</p>
+                <div class="upload-options">
+                  <div class="file-input-wrapper">
+                    <input type="file" id="studentEssayFile" accept=".pdf,.doc,.docx,.txt" class="file-input">
+                    <label for="studentEssayFile" class="file-label">📄 Upload Document</label>
+                  </div>
+                </div>
+                <p style="text-align: center; margin: 10px 0;">OR</p>
+                <textarea id="studentEssay" placeholder="Enter your essay text here..." class="essay-input"></textarea>
+              </div>
+            </div>
+
+            <button onclick="submitAssignment()" class="btn btn-submit">Submit for Grading</button>
+            <div id="submissionStatus" class="status"></div>
+          </section>
+
+          <!-- Results Section -->
+          <section class="card results-section" id="resultsSection" style="display: none;">
+            <div class="card-header">
+              <h2>Your Grading Results</h2>
+              <p class="subtitle">Detailed evaluation breakdown</p>
+            </div>
+            <div id="results" class="results-container"></div>
+          </section>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>AcademicGrade © 2024 | Intelligent Assessment System</p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Camera Modal -->
+  <div id="cameraModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📷 Capture Diagram</h2>
+        <button onclick="closeCamera()" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <video id="cameraVideo" autoplay playsinline></video>
+        <canvas id="cameraCanvas" style="display: none;"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button onclick="capturePhoto()" class="btn btn-primary">📸 Capture</button>
+        <button onclick="closeCamera()" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
