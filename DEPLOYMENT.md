@@ -1,4 +1,4 @@
-# Deployment Guide
+# Deployment Guide - Render
 
 ## Push to GitHub
 
@@ -22,116 +22,82 @@ git branch -M main
 git push -u origin main
 ```
 
-### Step 3: Verify
+---
 
-Visit `https://github.com/YOUR_USERNAME/diagram-essay-grading-system` to confirm your code is there.
+## Deploy to Render
+
+### Step 1: Sign Up for Render
+
+1. Go to [Render](https://render.com)
+2. Sign up with GitHub (recommended) or email
+3. Free tier is sufficient for this project
+
+### Step 2: Deploy Web Service
+
+1. Go to [Render Dashboard](https://dashboard.render.com/)
+2. Click **"New"** → **"Web Service"**
+3. Click **"Connect GitHub"** and authorize Render
+4. Select your `diagram-essay-grading-system` repository
+5. Render will auto-detect configuration from `render.yaml`
+6. Click **"Apply"** or **"Create Web Service"**
+
+### Step 3: Wait for Build
+
+- Build process takes 2-5 minutes
+- Watch the logs in real-time
+- Once complete, you'll get a live URL
 
 ---
 
-## Deploy to Vercel
+## Your Live URL
 
-### Option 1: Deploy via Vercel CLI (Recommended)
-
-```bash
-# Install Vercel CLI globally
-npm install -g vercel
-
-# Login to Vercel
-vercel login
-
-# Deploy from project directory
-vercel
+After deployment, your app will be available at:
+```
+https://diagram-essay-grading-system.onrender.com
 ```
 
-Follow the prompts:
-- Link to existing project? → No
-- Set project name → `diagram-essay-grading-system`
-- Set project root → `./`
-- Override settings → No
-
-### Option 2: Deploy via Vercel Dashboard
-
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Click "Add New..." → "Project"
-3. Select "Import Git Repository"
-4. Paste your GitHub repository URL
-5. Click "Import"
-6. Configure project settings:
-   - Framework: Other
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-   - Install Command: `npm install`
-7. Click "Deploy"
-
-### Option 3: Deploy via GitHub Integration
-
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Click "Add New..." → "Project"
-3. Connect your GitHub account
-4. Select the `diagram-essay-grading-system` repository
-5. Vercel will auto-detect settings
-6. Click "Deploy"
+Or a custom subdomain you choose during setup.
 
 ---
 
-## Post-Deployment Configuration
+## Automatic Deployments
 
-### Update API URL in Frontend
-
-After deployment, update the API URL in `public/app.js`:
-
-```javascript
-// Change this line:
-const API_URL = 'http://localhost:3000/api';
-
-// To your Vercel domain:
-const API_URL = 'https://your-project-name.vercel.app/api';
-```
-
-Then push the changes:
+Every time you push to the `main` branch, Render automatically:
+1. Pulls latest code
+2. Runs `npm install && npm run build`
+3. Restarts the service with `npm start`
 
 ```bash
-git add public/app.js
-git commit -m "Update API URL for production"
+# Make changes
+git add .
+git commit -m "Update feature"
 git push
-```
 
-Vercel will automatically redeploy.
+# Render automatically redeploys! 🚀
+```
 
 ---
 
-## Environment Variables (if needed)
+## Important Free Tier Limitations
 
-Create a `.env.production` file for production-specific variables:
+⚠️ **Render Free Tier:**
+- Service spins down after 15 minutes of inactivity
+- First request after spin-down takes ~30 seconds
+- `/uploads` folder is ephemeral (files reset on restart)
 
-```
-NODE_ENV=production
-```
-
-Add to Vercel dashboard:
-1. Go to Project Settings
-2. Click "Environment Variables"
-3. Add your variables
-4. Redeploy
+For production with persistent file storage, upgrade to paid tier or use cloud storage (S3, Cloudinary).
 
 ---
 
-## Monitoring & Logs
+## Monitoring
 
-### View Deployment Logs
+### View Logs
+1. Go to Render Dashboard
+2. Select your web service
+3. Click "Logs" tab
 
-```bash
-# Using Vercel CLI
-vercel logs
-```
-
-Or visit your Vercel dashboard to view logs in real-time.
-
-### Monitor Performance
-
-- Vercel Dashboard shows analytics
-- Check build times and function execution
-- Monitor bandwidth usage
+### Health Check
+Render monitors: `https://your-app.onrender.com/api/health`
 
 ---
 
@@ -139,64 +105,34 @@ Or visit your Vercel dashboard to view logs in real-time.
 
 ### Build Fails
 
-1. Check build logs in Vercel dashboard
-2. Ensure `npm run build` works locally
-3. Verify all dependencies are in `package.json`
+Check logs in Render Dashboard. Common fixes:
+
+```bash
+# Test locally first
+npm install
+npm run build
+npm start
+```
+
+### Service Won't Start
+
+1. Verify `render.yaml` configuration
+2. Check that port 3000 is used
+3. Ensure all dependencies are in `package.json`
 
 ### API Not Working
 
-1. Check that API URL is correct in frontend
-2. Verify environment variables are set
-3. Check Vercel function logs
-
-### File Upload Issues
-
-1. Ensure `/uploads` directory exists
-2. Check file size limits (10MB default)
-3. Verify CORS is enabled
-
----
-
-## Continuous Deployment
-
-Once connected to GitHub, Vercel will automatically:
-- Deploy on every push to `main` branch
-- Create preview deployments for pull requests
-- Show deployment status in GitHub
-
----
-
-## Custom Domain (Optional)
-
-1. Go to Vercel Project Settings
-2. Click "Domains"
-3. Add your custom domain
-4. Follow DNS configuration instructions
-
----
-
-## Rollback
-
-If something goes wrong:
-
-```bash
-# View deployment history
-vercel list
-
-# Rollback to previous deployment
-vercel rollback
-```
-
-Or use Vercel dashboard to select a previous deployment.
+1. Test health endpoint: `/api/health`
+2. Check browser console for CORS errors
+3. Verify environment variables are set
 
 ---
 
 ## Next Steps
 
-1. ✅ Push to GitHub
-2. ✅ Deploy to Vercel
-3. ✅ Update API URL
-4. ✅ Test in production
-5. ✅ Share with users
+✅ Push to GitHub  
+✅ Deploy to Render  
+✅ Test the live URL  
+✅ Share with users  
 
-Your application is now live! 🚀
+Your grading system is now live! 🎓
